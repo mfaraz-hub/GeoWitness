@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Circle, CircleMarker, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, WMSTileLayer, Circle, CircleMarker, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
-import { MapPin, Bell, X, ChevronRight, IndianRupee, Calendar, CheckCircle2, Users, FileText, AlertTriangle, TrendingUp, Building2, Phone, Mail, ExternalLink, Clock, Shield, Wrench } from 'lucide-react'
+import { MapPin, Bell, X, ChevronRight, IndianRupee, Calendar, CheckCircle2, Users, FileText, AlertTriangle, TrendingUp, Building2, Phone, Mail, ExternalLink, Clock, Shield, Wrench, Layers, Heart, GraduationCap, Truck, ShoppingBag } from 'lucide-react'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons broken by Vite bundling
@@ -12,48 +12,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-// Project pin custom icon
-const projectIcon = L.divIcon({
-  className: '',
-  html: `<div style="
-    width:36px;height:36px;
-    background:linear-gradient(135deg,#f97316,#f59e0b);
-    border-radius:50% 50% 50% 0;
-    transform:rotate(-45deg);
-    border:3px solid white;
-    box-shadow:0 4px 16px rgba(249,115,22,0.5);
-  "></div>`,
-  iconSize: [36, 36],
-  iconAnchor: [18, 36],
-  popupAnchor: [0, -38],
-})
-
-// User marker icon
-const userIcon = (active) => L.divIcon({
-  className: '',
-  html: `<div style="
-    width:20px;height:20px;
-    background:${active ? '#22c55e' : '#3b82f6'};
-    border-radius:50%;
-    border:3px solid white;
-    box-shadow:0 0 0 4px ${active ? 'rgba(34,197,94,0.3)' : 'rgba(59,130,246,0.3)'};
-    transition:all 0.5s ease;
-  "></div>`,
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-})
-
-// ─── Coordinates from provided Leaflet snippet ───────────────────────────────
-// Primary: Government Hospital at [28.6139, 77.2090] (Connaught Place area, Delhi)
-// Geo-fence radius: 500m   Color: blue
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── DATASET DEFINITIONS ──────────────────────────────────────────────────────
 
 const projects = [
   {
     id: 1,
     name: 'Government Hospital Upgrade',
-    popupLabel: 'Government Hospital Upgrade Completed',
+    popupLabel: 'Government Hospital Upgrade — In Progress',
     type: 'Government Hospital',
+    category: 'hospitals',
     lat: 28.6139,
     lng: 77.2090,
     radius: 500,
@@ -93,6 +60,7 @@ const projects = [
     name: 'Yamuna Cable Bridge — Phase 2',
     popupLabel: 'Yamuna Cable Bridge — Under Construction',
     type: 'Infrastructure',
+    category: 'bridges',
     lat: 28.6304,
     lng: 77.2897,
     radius: 500,
@@ -131,6 +99,7 @@ const projects = [
     name: 'Metro Phase 4 — Aerocity Corridor',
     popupLabel: 'Metro Phase 4 — Active Construction Zone',
     type: 'Transport',
+    category: 'bridges',
     lat: 28.6229,
     lng: 77.0689,
     radius: 500,
@@ -164,16 +133,386 @@ const projects = [
       { label: 'Systems & Signalling', done: false },
     ],
   },
+  // ── SCHOOLS ──────────────────────────────────────────────────────────────
+  {
+    id: 4,
+    name: 'Govt. Model School — Bengaluru North',
+    popupLabel: 'New Government Model School — Under Construction',
+    type: 'Education',
+    category: 'schools',
+    lat: 13.0827,
+    lng: 77.5877,
+    radius: 400,
+    budget: '₹14.8 Cr',
+    spent: '₹8.9 Cr',
+    progress: 60,
+    deadline: 'Aug 2026',
+    color: '#22d3ee',
+    contractor: 'Karnataka Building Construction Corp.',
+    contractorContact: '+91-80-2220-1001',
+    contractorEmail: 'projects@kbcc.karnataka.gov.in',
+    sanctionedBy: 'Dept. of Public Instruction, Karnataka',
+    tenderNo: 'DPI/KA/2023/SCH-114',
+    startDate: 'Mar 2024',
+    workers: 88,
+    safetyRating: 'A',
+    lastInspection: '10 Mar 2026',
+    nextInspection: '10 Apr 2026',
+    description: 'Construction of a new 3-storey model school with 36 classrooms, science labs, a computer centre, and a 500-seat auditorium for students in the North Bengaluru municipal zone.',
+    impact: '1,800 students to benefit, 36 new classrooms, 4 science labs',
+    complaints: 1,
+    updates: [
+      { date: 'Mar 2026', text: 'Second floor slab poured. Staircase and elevator shaft ongoing.' },
+      { date: 'Dec 2025', text: 'Ground floor structure complete. Electrical conduit laying started.' },
+      { date: 'Aug 2025', text: 'Foundation and plinth completed. RCC columns rising.' },
+    ],
+    milestones: [
+      { label: 'Foundation & Plinth', done: true },
+      { label: 'Ground Floor Structure', done: true },
+      { label: 'Upper Floors', done: false },
+      { label: 'Interior & Fit-out', done: false },
+      { label: 'Playground & Landscaping', done: false },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Navodaya Vidyalaya Expansion — Mysuru',
+    popupLabel: 'Navodaya Vidyalaya New Block — Active Site',
+    type: 'Education',
+    category: 'schools',
+    lat: 12.2958,
+    lng: 76.6394,
+    radius: 350,
+    budget: '₹9.2 Cr',
+    spent: '₹3.1 Cr',
+    progress: 34,
+    deadline: 'Jan 2027',
+    color: '#22d3ee',
+    contractor: 'Prakruthi Constructions Pvt. Ltd.',
+    contractorContact: '+91-821-244-0099',
+    contractorEmail: 'mys@prakruthi.in',
+    sanctionedBy: 'Navodaya Vidyalaya Samiti — Southern Region',
+    tenderNo: 'NVS/SR/2023/MYS-07',
+    startDate: 'Oct 2024',
+    workers: 54,
+    safetyRating: 'B+',
+    lastInspection: '5 Mar 2026',
+    nextInspection: '5 Apr 2026',
+    description: 'Addition of a residential hostel block (120 rooms), new dining hall, and a multi-purpose sports complex for the Navodaya Vidyalaya campus in Mysuru district.',
+    impact: '120 hostel rooms, dining hall for 600 students, full sports complex',
+    complaints: 0,
+    updates: [
+      { date: 'Feb 2026', text: 'Column casting of hostel block reaching first floor level.' },
+      { date: 'Nov 2025', text: 'Foundation work completed for all three blocks.' },
+      { date: 'Oct 2025', text: 'Site clearance and soil testing completed.' },
+    ],
+    milestones: [
+      { label: 'Site Preparation', done: true },
+      { label: 'Foundation Work', done: true },
+      { label: 'Superstructure', done: false },
+      { label: 'Roofing & Finishing', done: false },
+    ],
+  },
+  // ── BRIDGES ───────────────────────────────────────────────────────────────
+  {
+    id: 6,
+    name: 'Cauvery ROB — Mandya Bypass',
+    popupLabel: 'Cauvery Rail Over-Bridge — Construction Active',
+    type: 'Bridge',
+    category: 'bridges',
+    lat: 12.5244,
+    lng: 76.8974,
+    radius: 600,
+    budget: '₹67 Cr',
+    spent: '₹28.4 Cr',
+    progress: 42,
+    deadline: 'Sep 2026',
+    color: '#fb923c',
+    contractor: 'L&T Construction — Transport Infrastructure',
+    contractorContact: '+91-22-6705-0505',
+    contractorEmail: 'rob@larsentoubro.com',
+    sanctionedBy: 'NHAI — Karnataka Circle',
+    tenderNo: 'NHAI/KA/2022/ROB-55',
+    startDate: 'Jun 2023',
+    workers: 210,
+    safetyRating: 'A',
+    lastInspection: '18 Mar 2026',
+    nextInspection: '18 Apr 2026',
+    description: 'Construction of a 4-lane Rail Over-Bridge across the Cauvery river and Southern Railways line near Mandya, eliminating a dangerous level crossing and easing traffic on NH-275.',
+    impact: 'Eliminates dangerous level crossing, 4-lane road, 40,000 vehicles/day',
+    complaints: 3,
+    updates: [
+      { date: 'Mar 2026', text: 'Pier caps cast on 6 of 9 piers. PSC girder launching underway.' },
+      { date: 'Dec 2025', text: 'Railway NOC obtained. Pier construction proceeding.' },
+      { date: 'Sep 2025', text: 'Bore piling completed on both abutments.' },
+    ],
+    milestones: [
+      { label: 'Piling & Abutments', done: true },
+      { label: 'Pier Construction', done: false },
+      { label: 'Girder Launching', done: false },
+      { label: 'Deck & Railing', done: false },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Netravathi Flyover — Mangaluru Port Road',
+    popupLabel: 'Netravathi Flyover — Piling Works Active',
+    type: 'Bridge',
+    category: 'bridges',
+    lat: 12.8698,
+    lng: 74.8428,
+    radius: 550,
+    budget: '₹84 Cr',
+    spent: '₹12.6 Cr',
+    progress: 15,
+    deadline: 'Dec 2027',
+    color: '#fb923c',
+    contractor: 'HOWE India Pvt. Ltd.',
+    contractorContact: '+91-44-2815-1500',
+    contractorEmail: 'mgr@howeindia.com',
+    sanctionedBy: 'KRIDL — Karnataka Roads Infrastructure',
+    tenderNo: 'KRIDL/MNG/2024/FLY-09',
+    startDate: 'Jan 2025',
+    workers: 130,
+    safetyRating: 'B',
+    lastInspection: '1 Mar 2026',
+    nextInspection: '1 Apr 2026',
+    description: 'Six-lane flyover spanning the Netravathi river approach road, connecting Mangaluru New Port with NH-75. Includes pedestrian footpaths and a scenic river viewing gallery.',
+    impact: '6-lane flyover, port traffic relief, 60,000 vehicles/day projected',
+    complaints: 2,
+    updates: [
+      { date: 'Mar 2026', text: 'Bore piling 40% complete. Mobilisation of batching plant done.' },
+      { date: 'Jan 2026', text: 'Contractor mobilisation and site office setup completed.' },
+      { date: 'Jan 2025', text: 'Work order issued. Survey and utility shifting underway.' },
+    ],
+    milestones: [
+      { label: 'Survey & Utility Shifting', done: true },
+      { label: 'Piling Works', done: false },
+      { label: 'Pier & Abutment', done: false },
+      { label: 'Superstructure', done: false },
+    ],
+  },
+  // ── MALLS ─────────────────────────────────────────────────────────────────
+  {
+    id: 8,
+    name: 'Prestige Kochi Mall — Phase 3',
+    popupLabel: 'Prestige Kochi Mall Phase 3 — Superstructure Rising',
+    type: 'Commercial',
+    category: 'malls',
+    lat: 9.9312,
+    lng: 76.2673,
+    radius: 450,
+    budget: '₹310 Cr',
+    spent: '₹201.5 Cr',
+    progress: 65,
+    deadline: 'Nov 2026',
+    color: '#f472b6',
+    contractor: 'Prestige Construction Ltd.',
+    contractorContact: '+91-80-2211-5353',
+    contractorEmail: 'commercial@prestigegroup.in',
+    sanctionedBy: 'Kochi Municipal Corp. — Commercial Division',
+    tenderNo: 'KMC/COM/2022/MALL-03',
+    startDate: 'Jul 2022',
+    workers: 560,
+    safetyRating: 'A+',
+    lastInspection: '22 Mar 2026',
+    nextInspection: '22 Apr 2026',
+    description: 'Phase 3 expansion of Prestige Kochi Mall adding a 4-floor retail podium, 12-screen multiplex, food court with 50 outlets, and rooftop sky-garden. Total leasable area: 4.2 lakh sq.ft.',
+    impact: '4.2 lakh sq.ft new retail, 3,000+ jobs, 12-screen multiplex',
+    complaints: 4,
+    updates: [
+      { date: 'Mar 2026', text: 'Multiplex floors 3–4 slab poured. HVAC ductwork installation ongoing.' },
+      { date: 'Dec 2025', text: 'Façade glazing 70% complete on retail podium.' },
+      { date: 'Aug 2025', text: 'Structural steel for multiplex wing fully erected.' },
+    ],
+    milestones: [
+      { label: 'Foundation & Basement', done: true },
+      { label: 'Structural Frame', done: true },
+      { label: 'Façade & Glazing', done: false },
+      { label: 'Interior Fit-out', done: false },
+      { label: 'Multiplex & Food Court', done: false },
+    ],
+  },
+  {
+    id: 9,
+    name: 'Nexus Whitefield Mall — New Wing',
+    popupLabel: 'Nexus Whitefield Mall Expansion — Topping Out',
+    type: 'Commercial',
+    category: 'malls',
+    lat: 12.9698,
+    lng: 77.7500,
+    radius: 400,
+    budget: '₹195 Cr',
+    spent: '₹156 Cr',
+    progress: 80,
+    deadline: 'Jun 2026',
+    color: '#f472b6',
+    contractor: 'Shapoorji Pallonji & Co.',
+    contractorContact: '+91-22-6735-3535',
+    contractorEmail: 'retail@shapoorji.com',
+    sanctionedBy: 'BBMP — Commercial Building Division',
+    tenderNo: 'BBMP/COM/2022/NXS-11',
+    startDate: 'Apr 2022',
+    workers: 420,
+    safetyRating: 'A',
+    lastInspection: '15 Mar 2026',
+    nextInspection: '15 Apr 2026',
+    description: 'New south wing of Nexus Whitefield Mall featuring a luxury retail zone, 6-screen IMAX theatre, adventure zone, and dedicated EV parking with 200 charging bays.',
+    impact: '2.8 lakh sq.ft, IMAX theatre, 200 EV bays, 2,000+ jobs',
+    complaints: 3,
+    updates: [
+      { date: 'Mar 2026', text: 'Interior cladding and waterproofing complete on all floors.' },
+      { date: 'Jan 2026', text: 'Rooftop slab and IMAX theatre shell fully complete.' },
+      { date: 'Sep 2025', text: 'Structural topping-out ceremony held.' },
+    ],
+    milestones: [
+      { label: 'Foundation & Piling', done: true },
+      { label: 'Structural Frame', done: true },
+      { label: 'Roofing & Waterproofing', done: true },
+      { label: 'Interior Fit-out', done: false },
+      { label: 'EV Charging & MEP', done: false },
+    ],
+  },
+  // ── OTHER BUILDINGS ───────────────────────────────────────────────────────
+  {
+    id: 10,
+    name: 'BBMP Multi-Level Car Park — Shivajinagar',
+    popupLabel: 'BBMP MLCP Shivajinagar — Steel Frame Rising',
+    type: 'Civic Building',
+    category: 'buildings',
+    lat: 12.9794,
+    lng: 77.5961,
+    radius: 350,
+    budget: '₹52 Cr',
+    spent: '₹19.5 Cr',
+    progress: 37,
+    deadline: 'Mar 2027',
+    color: '#34d399',
+    contractor: 'Tata Projects Ltd.',
+    contractorContact: '+91-40-6611-7000',
+    contractorEmail: 'civic@tataprojects.com',
+    sanctionedBy: 'BBMP — Town Planning Division',
+    tenderNo: 'BBMP/TP/2023/MLCP-07',
+    startDate: 'Aug 2024',
+    workers: 98,
+    safetyRating: 'A+',
+    lastInspection: '12 Mar 2026',
+    nextInspection: '12 Apr 2026',
+    description: 'Eight-storey multi-level car park in Shivajinagar CBD with 1,200 mechanised parking bays, EV charging on every floor, and a dedicated bus bay for BMTC integration.',
+    impact: '1,200 parking bays, reduces on-street parking by 80%, 200 EV points',
+    complaints: 1,
+    updates: [
+      { date: 'Mar 2026', text: 'Steel frame up to 4th floor. Composite deck slab casting ongoing.' },
+      { date: 'Dec 2025', text: 'Structural steel erection commenced after column base plates set.' },
+      { date: 'Oct 2025', text: 'Pile caps and raft foundation poured. Ground floor plinth done.' },
+    ],
+    milestones: [
+      { label: 'Foundation & Pile Cap', done: true },
+      { label: 'Ground Floor Plinth', done: true },
+      { label: 'Steel Frame (Floors 1–8)', done: false },
+      { label: 'Façade & Cladding', done: false },
+      { label: 'Mechanical Parking Systems', done: false },
+    ],
+  },
+  {
+    id: 11,
+    name: 'Hubli Smart City Command Centre',
+    popupLabel: 'Hubli Smart City Command Centre — Fit-out Stage',
+    type: 'Civic Building',
+    category: 'buildings',
+    lat: 15.3647,
+    lng: 75.1240,
+    radius: 300,
+    budget: '₹28 Cr',
+    spent: '₹23.8 Cr',
+    progress: 85,
+    deadline: 'May 2026',
+    color: '#34d399',
+    contractor: 'NEC Corporation India Ltd.',
+    contractorContact: '+91-80-4179-1100',
+    contractorEmail: 'smartcity@nec.com',
+    sanctionedBy: 'Hubli-Dharwad Smart City Ltd.',
+    tenderNo: 'HDSCL/ICT/2022/CMD-01',
+    startDate: 'Jan 2023',
+    workers: 45,
+    safetyRating: 'A+',
+    lastInspection: '20 Mar 2026',
+    nextInspection: '20 Apr 2026',
+    description: 'State-of-the-art integrated command and control centre for Hubli-Dharwad Smart City — housing 24×7 surveillance analytics, traffic management, grievance redressal, and emergency response systems.',
+    impact: 'Monitors 2,000+ CCTV cameras, real-time traffic AI, 50+ city services integrated',
+    complaints: 0,
+    updates: [
+      { date: 'Mar 2026', text: 'Server room commissioning complete. Operator console install ongoing.' },
+      { date: 'Jan 2026', text: 'Networking and CCTV integration 90% done. UAT in progress.' },
+      { date: 'Oct 2025', text: 'Civil works complete. IT infrastructure installation commenced.' },
+    ],
+    milestones: [
+      { label: 'Civil Construction', done: true },
+      { label: 'Server Room Setup', done: true },
+      { label: 'Network Integration', done: true },
+      { label: 'Operator Consoles', done: false },
+      { label: 'Live Operations Launch', done: false },
+    ],
+  },
+  {
+    id: 12,
+    name: 'Kalaburagi District Court Complex',
+    popupLabel: 'New District Court Complex — RCC Frame Complete',
+    type: 'Civic Building',
+    category: 'buildings',
+    lat: 17.3297,
+    lng: 76.8343,
+    radius: 400,
+    budget: '₹38 Cr',
+    spent: '₹15.2 Cr',
+    progress: 40,
+    deadline: 'Oct 2027',
+    color: '#34d399',
+    contractor: 'PWD Karnataka — Special Projects',
+    contractorContact: '+91-8472-225678',
+    contractorEmail: 'kalaburagi@pwd.karnataka.gov.in',
+    sanctionedBy: 'Karnataka PWD — High Court Building Cell',
+    tenderNo: 'PWD/KA/2023/COURT-04',
+    startDate: 'Nov 2023',
+    workers: 76,
+    safetyRating: 'B+',
+    lastInspection: '8 Mar 2026',
+    nextInspection: '8 Apr 2026',
+    description: 'New integrated court complex for Kalaburagi district with 20 court halls, a public facilititation centre, legal aid clinic, e-court infrastructure, and a secure custody centre.',
+    impact: '20 court halls, reduces case backlog, 500+ daily litigants served',
+    complaints: 1,
+    updates: [
+      { date: 'Feb 2026', text: 'RCC frame for main building fully complete. Brick masonry ongoing.' },
+      { date: 'Nov 2025', text: 'Foundation and columns for Block-B completed.' },
+      { date: 'Jun 2025', text: 'Block-A RCC frame reached final level.' },
+    ],
+    milestones: [
+      { label: 'Foundation', done: true },
+      { label: 'RCC Frame', done: true },
+      { label: 'Masonry & Plaster', done: false },
+      { label: 'Flooring & Doors', done: false },
+      { label: 'e-Court IT Setup', done: false },
+    ],
+  },
+]
+
+// ── LAYER CATEGORIES ──────────────────────────────────────────────────────────
+const layerCategories = [
+  { id: 'all', label: 'All', icon: Layers, color: '#ffffff' },
+  { id: 'hospitals', label: 'Hospitals', icon: Heart, color: '#3b82f6' },
+  { id: 'schools', label: 'Schools', icon: GraduationCap, color: '#22d3ee' },
+  { id: 'bridges', label: 'Bridges', icon: Truck, color: '#fb923c' },
+  { id: 'malls', label: 'Malls', icon: ShoppingBag, color: '#f472b6' },
+  { id: 'buildings', label: 'Buildings', icon: Building2, color: '#34d399' },
 ]
 
 // Route walks from ~800m outside the hospital zone into it
-// Starting north-east of [28.6139, 77.2090], stepping closer each tick
 const userRoute = [
-  [28.6210, 77.2180],   // ~1.1km away — outside
-  [28.6190, 77.2160],   // ~900m
-  [28.6170, 77.2140],   // ~700m
-  [28.6155, 77.2115],   // ~400m — approaching boundary
-  [28.6139, 77.2090],   // ← exact pin coords — inside zone (radius 500m)
+  [28.6210, 77.2180],
+  [28.6190, 77.2160],
+  [28.6170, 77.2140],
+  [28.6155, 77.2115],
+  [28.6139, 77.2090],
 ]
 
 // Component to pan/zoom map programmatically
@@ -274,10 +613,8 @@ function DashboardModal({ project, onClose }) {
           {/* ── OVERVIEW TAB ── */}
           {tab === 'overview' && (
             <>
-              {/* Description */}
               <p className="text-white/60 text-sm leading-relaxed">{project.description}</p>
 
-              {/* KPI strip */}
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { icon: IndianRupee, label: 'Total Budget', val: project.budget, color: '#ff9933' },
@@ -292,7 +629,6 @@ function DashboardModal({ project, onClose }) {
                 ))}
               </div>
 
-              {/* Progress bar */}
               <div>
                 <div className="flex justify-between text-xs text-white/40 mb-2">
                   <span>Overall Completion</span>
@@ -303,7 +639,6 @@ function DashboardModal({ project, onClose }) {
                 </div>
               </div>
 
-              {/* Milestones */}
               <div>
                 <div className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-3">Milestones</div>
                 <div className="space-y-2">
@@ -321,7 +656,6 @@ function DashboardModal({ project, onClose }) {
                 </div>
               </div>
 
-              {/* Citizen Impact */}
               <div className="rounded-xl p-4" style={{ background: 'rgba(255,153,51,0.06)', border: '1px solid rgba(255,153,51,0.15)' }}>
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-4 h-4 text-orange-400" />
@@ -348,7 +682,6 @@ function DashboardModal({ project, onClose }) {
                 ))}
               </div>
 
-              {/* Spend progress */}
               <div>
                 <div className="flex justify-between text-xs text-white/40 mb-2">
                   <span>Budget Utilisation</span>
@@ -489,7 +822,7 @@ function NotificationCard({ project, onClose, onViewDashboard }) {
           </div>
           <div>
             <div className="text-xs text-orange-400 font-semibold tracking-wide">GeoWitness Alert</div>
-            <div className="text-[11px] text-white/40">Just now · New Delhi</div>
+            <div className="text-[11px] text-white/40">Just now · Geo-Fenced Zone</div>
           </div>
         </div>
         <button onClick={onClose} className="text-white/30 hover:text-white/70 transition-colors">
@@ -532,7 +865,7 @@ function NotificationCard({ project, onClose, onViewDashboard }) {
       </div>
 
       <div className="space-y-1.5 mb-4">
-        {project.milestones.map((m) => (
+        {project.milestones.slice(0, 4).map((m) => (
           <div key={m.label} className="flex items-center gap-2 text-xs">
             <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center flex-shrink-0 ${m.done ? 'bg-emerald-500' : 'bg-white/10 border border-white/20'}`}>
               {m.done && <span className="text-white text-[8px]">✓</span>}
@@ -552,6 +885,22 @@ function NotificationCard({ project, onClose, onViewDashboard }) {
   )
 }
 
+// ── WMS Legend item ──────────────────────────────────────────────────────────
+function WmsLegendItem({ layerName, layerId }) {
+  return (
+    <div className="flex items-center gap-2">
+      <img
+        src={`https://kgis.ksrsac.in/kgismaps1/services/Health/Health/MapServer/WmsServer?request=GetLegendGraphic&version=1.3.0&format=image/png&layer=${layerId}`}
+        alt={layerName}
+        className="w-5 h-5 object-contain flex-shrink-0"
+        onError={(e) => { e.target.style.display = 'none' }}
+      />
+      <span className="text-white/50 text-[10px] truncate">{layerName}</span>
+    </div>
+  )
+}
+
+// ── MAIN DEMO COMPONENT ───────────────────────────────────────────────────────
 export default function Demo() {
   const [userPos, setUserPos] = useState(userRoute[0])
   const [userInZone, setUserInZone] = useState(false)
@@ -562,6 +911,9 @@ export default function Demo() {
   const [step, setStep] = useState(0)
   const [mapCenter, setMapCenter] = useState([28.6139, 77.2090])
   const [mapZoom, setMapZoom] = useState(13)
+  const [activeLayer, setActiveLayer] = useState('all')
+  const [showWmsHealth, setShowWmsHealth] = useState(false)
+  const [showWmsLegend, setShowWmsLegend] = useState(false)
   const timersRef = useRef([])
 
   const steps = [
@@ -621,10 +973,37 @@ export default function Demo() {
     setStep(5)
   }
 
+  const handleLayerChange = (layerId) => {
+    setActiveLayer(layerId)
+    // When switching to Karnataka layers, pan map there
+    if (layerId === 'hospitals' && showWmsHealth) {
+      setMapCenter([15.3173, 75.7139])
+      setMapZoom(7)
+    }
+  }
+
   useEffect(() => {
     const t = setTimeout(runDemo, 800)
     return () => { clearTimeout(t); clearTimers() }
   }, [])
+
+  const visibleProjects = activeLayer === 'all'
+    ? projects
+    : projects.filter((p) => p.category === activeLayer)
+
+  // WMS sublayers to display in legend (sample from capabilities)
+  const wmsLegendLayers = [
+    { name: 'District Hospital', id: 91 },
+    { name: 'Community Health Center', id: 89 },
+    { name: 'Primary Health Center', id: 88 },
+    { name: 'Taluk Hospital', id: 90 },
+    { name: 'Sub Center', id: 87 },
+    { name: 'Blood Bank', id: 55 },
+    { name: 'Medical College', id: 5 },
+    { name: 'Nursing College', id: 4 },
+    { name: 'Ayurveda Hospital', id: 45 },
+    { name: 'Homoeopathy Hospital', id: 43 },
+  ]
 
   return (
     <>
@@ -638,7 +1017,7 @@ export default function Demo() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
-        <div className="text-center mb-12 reveal">
+        <div className="text-center mb-10 reveal">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-sm font-medium mb-5">
             Live Interactive Map
           </div>
@@ -647,27 +1026,110 @@ export default function Demo() {
             <span className="text-gradient-saffron">Constructions</span>
           </h2>
           <p className="text-white/50 text-lg max-w-xl mx-auto">
-            A real map of Delhi showing geo-fenced civic project zones. Click any pin or press Replay to simulate a user entering a zone.
+            A real map showing geo-fenced civic project zones across India. Click any pin or press Replay to simulate a user entering a zone.
           </p>
         </div>
 
+        {/* Layer category tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-5 reveal">
+          {layerCategories.map((cat) => {
+            const Icon = cat.icon
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleLayerChange(cat.id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
+                style={{
+                  background: activeLayer === cat.id ? `${cat.color}18` : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${activeLayer === cat.id ? cat.color : 'rgba(255,255,255,0.1)'}`,
+                  color: activeLayer === cat.id ? cat.color : 'rgba(255,255,255,0.45)',
+                }}
+              >
+                <Icon className="w-3 h-3" />
+                {cat.label}
+                <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold"
+                  style={{ background: activeLayer === cat.id ? `${cat.color}30` : 'rgba(255,255,255,0.08)' }}>
+                  {cat.id === 'all' ? projects.length : projects.filter(p => p.category === cat.id).length}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* WMS toggle */}
+        <div className="flex justify-center mb-6 reveal">
+          <button
+            onClick={() => {
+              setShowWmsHealth(!showWmsHealth)
+              if (!showWmsHealth) {
+                setMapCenter([15.3173, 75.7139])
+                setMapZoom(7)
+              }
+            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200"
+            style={{
+              background: showWmsHealth ? 'rgba(59,130,246,0.18)' : 'rgba(255,255,255,0.05)',
+              border: `1px solid ${showWmsHealth ? '#3b82f6' : 'rgba(255,255,255,0.12)'}`,
+              color: showWmsHealth ? '#60a5fa' : 'rgba(255,255,255,0.4)',
+            }}
+          >
+            <Heart className="w-3 h-3" />
+            Karnataka Health Facilities (WMS — Live Dataset)
+            <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold" style={{ background: showWmsHealth ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.08)' }}>
+              {showWmsHealth ? 'ON' : 'OFF'}
+            </span>
+          </button>
+        </div>
+
+        {/* WMS info banner */}
+        {showWmsHealth && (
+          <div className="mb-5 reveal">
+            <div className="rounded-xl p-4 flex flex-wrap items-start gap-4" style={{ background: 'rgba(59,130,246,0.07)', border: '1px solid rgba(59,130,246,0.2)' }}>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <Heart className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                  <span className="text-blue-400 text-xs font-bold uppercase tracking-wider">Live WMS Layer — KSRSAC Karnataka Health GIS</span>
+                </div>
+                <p className="text-white/50 text-xs leading-relaxed">
+                  Real health facility data served via WMS from <strong className="text-white/70">kgis.ksrsac.in</strong> — the Karnataka State Remote Sensing Application Centre.
+                  Includes District Hospitals, CHCs, PHCs, Sub-Centres, Blood Banks, Medical Colleges, Ayush facilities, and more across all Karnataka districts.
+                </p>
+              </div>
+              <button
+                onClick={() => setShowWmsLegend(!showWmsLegend)}
+                className="flex-shrink-0 text-blue-400/70 hover:text-blue-400 text-xs font-semibold transition-colors"
+              >
+                {showWmsLegend ? 'Hide Legend' : 'Show Legend'}
+              </button>
+            </div>
+
+            {showWmsLegend && (
+              <div className="mt-2 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                <div className="text-white/40 text-[10px] font-semibold uppercase tracking-widest mb-3">Layer Legend (Sample)</div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                  {wmsLegendLayers.map((l) => (
+                    <WmsLegendItem key={l.id} layerName={l.name} layerId={l.id} />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Project selector chips */}
-        <div className="flex flex-wrap justify-center gap-3 mb-6 reveal">
-          {projects.map((p) => (
+        <div className="flex flex-wrap justify-center gap-2 mb-6 reveal">
+          {visibleProjects.map((p) => (
             <button
               key={p.id}
               onClick={() => handleProjectClick(p)}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 hover:-translate-y-0.5"
               style={{
                 background: activeProject?.id === p.id ? `${p.color}20` : 'rgba(255,255,255,0.05)',
                 border: `1px solid ${activeProject?.id === p.id ? p.color : 'rgba(255,255,255,0.1)'}`,
                 color: activeProject?.id === p.id ? p.color : 'rgba(255,255,255,0.5)',
               }}
             >
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ background: p.color }}
-              />
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: p.color }} />
               {p.name.split('—')[0].trim()}
             </button>
           ))}
@@ -679,7 +1141,7 @@ export default function Demo() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                height: '420px',
+                height: '480px',
                 border: '1px solid rgba(255,255,255,0.08)',
                 boxShadow: '0 0 40px rgba(0,0,0,0.4)',
               }}
@@ -698,8 +1160,21 @@ export default function Demo() {
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
 
-                {/* Geo-fence circles for each project */}
-                {projects.map((p) => (
+                {/* Karnataka WMS Health Facilities layer */}
+                {showWmsHealth && (
+                  <WMSTileLayer
+                    url="https://kgis.ksrsac.in/kgismaps1/services/Health/Health/MapServer/WmsServer"
+                    layers="87,88,89,90,91,55,5,4,45,43,38,46,71"
+                    format="image/png"
+                    transparent={true}
+                    version="1.3.0"
+                    opacity={0.85}
+                    attribution='Health GIS &copy; KSRSAC Karnataka'
+                  />
+                )}
+
+                {/* Geo-fence circles for visible projects */}
+                {visibleProjects.map((p) => (
                   <Circle
                     key={p.id}
                     center={[p.lat, p.lng]}
@@ -707,7 +1182,7 @@ export default function Demo() {
                     pathOptions={{
                       color: p.color,
                       fillColor: p.color,
-                      fillOpacity: activeProject?.id === p.id ? 0.12 : 0.06,
+                      fillOpacity: activeProject?.id === p.id ? 0.14 : 0.06,
                       weight: activeProject?.id === p.id ? 2.5 : 1.5,
                       dashArray: '8 6',
                     }}
@@ -715,14 +1190,14 @@ export default function Demo() {
                 ))}
 
                 {/* Project markers */}
-                {projects.map((p) => (
+                {visibleProjects.map((p) => (
                   <Marker
                     key={p.id}
                     position={[p.lat, p.lng]}
                     icon={L.divIcon({
                       className: '',
                       html: `<div style="
-                        width:32px;height:32px;
+                        width:30px;height:30px;
                         background:linear-gradient(135deg,${p.color},${p.color}bb);
                         border-radius:50% 50% 50% 0;
                         transform:rotate(-45deg);
@@ -730,16 +1205,15 @@ export default function Demo() {
                         box-shadow:0 4px 20px ${p.color}70;
                         cursor:pointer;
                       "></div>`,
-                      iconSize: [32, 32],
-                      iconAnchor: [16, 32],
-                      popupAnchor: [0, -36],
+                      iconSize: [30, 30],
+                      iconAnchor: [15, 30],
+                      popupAnchor: [0, -34],
                     })}
                     eventHandlers={{ click: () => handleProjectClick(p) }}
                   >
                     <Popup>
                       <div style={{ color: 'white', minWidth: '200px', padding: '4px 2px' }}>
                         <div style={{ fontSize: '11px', color: p.color, fontWeight: 700, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{p.type}</div>
-                        {/* popupLabel mirrors the exact bindPopup text from the Leaflet snippet */}
                         <div style={{ fontWeight: 700, fontSize: '13px', marginBottom: '8px', lineHeight: '1.4' }}>{p.popupLabel}</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginBottom: '6px' }}>
                           <span>Budget: <strong style={{ color: '#ff9933' }}>{p.budget}</strong></span>
@@ -756,40 +1230,43 @@ export default function Demo() {
                   </Marker>
                 ))}
 
-                {/* Animated user marker */}
-                <CircleMarker
-                  center={userPos}
-                  radius={9}
-                  pathOptions={{
-                    color: userInZone ? '#22c55e' : '#3b82f6',
-                    fillColor: userInZone ? '#22c55e' : '#3b82f6',
-                    fillOpacity: 1,
-                    weight: 3,
-                    opacity: 1,
-                  }}
-                >
-                  <Popup>
-                    <div style={{ color: 'white', fontSize: '12px', padding: '2px' }}>
-                      <strong>📍 You</strong><br />
-                      <span style={{ color: userInZone ? '#22c55e' : '#93c5fd', fontSize: '11px' }}>
-                        {userInZone ? '✅ Inside geo-fenced zone' : 'Walking near project area'}
-                      </span>
-                    </div>
-                  </Popup>
-                </CircleMarker>
+                {/* Animated user marker (only shown in Delhi view during demo) */}
+                {(activeLayer === 'all' || activeLayer === 'hospitals' || activeLayer === 'bridges') && (
+                  <>
+                    <CircleMarker
+                      center={userPos}
+                      radius={9}
+                      pathOptions={{
+                        color: userInZone ? '#22c55e' : '#3b82f6',
+                        fillColor: userInZone ? '#22c55e' : '#3b82f6',
+                        fillOpacity: 1,
+                        weight: 3,
+                        opacity: 1,
+                      }}
+                    >
+                      <Popup>
+                        <div style={{ color: 'white', fontSize: '12px', padding: '2px' }}>
+                          <strong>📍 You</strong><br />
+                          <span style={{ color: userInZone ? '#22c55e' : '#93c5fd', fontSize: '11px' }}>
+                            {userInZone ? '✅ Inside geo-fenced zone' : 'Walking near project area'}
+                          </span>
+                        </div>
+                      </Popup>
+                    </CircleMarker>
 
-                {/* Outer pulse ring for user */}
-                <CircleMarker
-                  center={userPos}
-                  radius={18}
-                  pathOptions={{
-                    color: userInZone ? '#22c55e' : '#3b82f6',
-                    fillColor: 'transparent',
-                    fillOpacity: 0,
-                    weight: 1.5,
-                    opacity: 0.4,
-                  }}
-                />
+                    <CircleMarker
+                      center={userPos}
+                      radius={18}
+                      pathOptions={{
+                        color: userInZone ? '#22c55e' : '#3b82f6',
+                        fillColor: 'transparent',
+                        fillOpacity: 0,
+                        weight: 1.5,
+                        opacity: 0.4,
+                      }}
+                    />
+                  </>
+                )}
               </MapContainer>
             </div>
 
@@ -815,6 +1292,29 @@ export default function Demo() {
               <MapPin className="w-4 h-4" />
               {running ? 'Simulation Running...' : 'Replay Demo'}
             </button>
+
+            {/* Dataset summary */}
+            <div className="mt-4 grid grid-cols-5 gap-2">
+              {layerCategories.slice(1).map((cat) => {
+                const Icon = cat.icon
+                const count = projects.filter(p => p.category === cat.id).length
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleLayerChange(cat.id)}
+                    className="flex flex-col items-center gap-1 p-2 rounded-xl text-center transition-all hover:-translate-y-0.5"
+                    style={{
+                      background: activeLayer === cat.id ? `${cat.color}15` : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${activeLayer === cat.id ? cat.color + '60' : 'rgba(255,255,255,0.07)'}`,
+                    }}
+                  >
+                    <Icon className="w-3.5 h-3.5" style={{ color: cat.color }} />
+                    <span className="text-white font-bold text-sm">{count}</span>
+                    <span className="text-white/30 text-[9px]">{cat.label}</span>
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Notification panel — 2 cols */}
@@ -840,6 +1340,48 @@ export default function Demo() {
                 </div>
               )
             }
+
+            {/* Dataset legend */}
+            <div className="mt-5 rounded-2xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <div className="text-[10px] font-semibold text-white/30 uppercase tracking-widest">Map Datasets</div>
+
+              {layerCategories.slice(1).map((cat) => {
+                const Icon = cat.icon
+                const catProjects = projects.filter(p => p.category === cat.id)
+                return (
+                  <div key={cat.id}>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: cat.color }} />
+                      <span className="text-white/60 text-xs font-semibold">{cat.label}</span>
+                      <span className="ml-auto text-white/30 text-[10px]">{catProjects.length} sites</span>
+                    </div>
+                    <div className="pl-5 space-y-1">
+                      {catProjects.map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => handleProjectClick(p)}
+                          className="w-full text-left flex items-center gap-2 py-1 text-[11px] text-white/40 hover:text-white/70 transition-colors"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: p.color }} />
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+
+              <div className="pt-2 border-t border-white/5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Heart className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                  <span className="text-white/60 text-xs font-semibold">Karnataka Health (WMS)</span>
+                  <span className="ml-auto text-white/30 text-[10px]">Live</span>
+                </div>
+                <p className="pl-5 text-white/30 text-[10px] leading-relaxed">
+                  Real-time health facility layer from KSRSAC — 90+ layer types including hospitals, dispensaries, blood banks, medical colleges & Ayush centres.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
