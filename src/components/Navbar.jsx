@@ -5,7 +5,7 @@ const navLinks = [
   { label: 'Problem', href: '#problem' },
   { label: 'Solution', href: '#solution' },
   { label: 'Features', href: '#features' },
-  { label: 'Demo', href: '#demo' },
+  { label: 'Ongoing Constructions', href: '#demo' },
   { label: 'Impact', href: '#impact' },
   { label: 'Contact', href: '#contact' },
 ]
@@ -34,8 +34,8 @@ export default function Navbar() {
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full animate-ping-dot" />
           </div>
           <div className="leading-tight">
-            <div className="font-bold text-sm text-white">HyperLocal</div>
-            <div className="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Targeting Engine</div>
+            <div className="font-bold text-sm text-white">GeoWitness</div>
+            <div className="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Civic Transparency</div>
           </div>
         </a>
 

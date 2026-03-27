@@ -40,8 +40,8 @@ export default function Footer() {
                 <MapPin className="w-5 h-5 text-white" />
               </div>
               <div className="leading-tight">
-                <div className="font-bold text-sm text-white">HyperLocal</div>
-                <div className="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Targeting Engine</div>
+                <div className="font-bold text-sm text-white">GeoWitness</div>
+                <div className="text-[10px] text-blue-400 font-medium tracking-widest uppercase">Civic Transparency</div>
               </div>
             </div>
             <p className="text-white/40 text-sm leading-relaxed mb-5 max-w-xs">
@@ -81,7 +81,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-white/8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-white/25 text-xs">
-            © 2025 HyperLocal Targeting Engine. All rights reserved. Built with ❤️ for a transparent India.
+            © 2025 GeoWitness. All rights reserved. Built with ❤️ for a transparent India.
           </div>
           <div className="flex items-center gap-4">
             {['Privacy', 'Terms', 'Cookies'].map((item) => (
