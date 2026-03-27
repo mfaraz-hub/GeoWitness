@@ -1,4 +1,4 @@
-import { MapPin, ArrowRight, Play } from 'lucide-react'
+import { MapPin, ArrowRight, Search } from 'lucide-react'
 
 // Animated city map SVG
 function CityMap() {
@@ -111,7 +111,7 @@ export default function Hero() {
             href="#demo"
             className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-full font-bold text-white text-lg shadow-lg shadow-blue-500/25 hover:shadow-blue-500/50 hover:-translate-y-1 transition-all duration-300"
           >
-            <Play className="w-5 h-5" /> Explore Demo
+            <Search className="w-5 h-5" /> Search Sites
           </a>
           <a
             href="#solution"
@@ -124,12 +124,12 @@ export default function Hero() {
         {/* Stats row */}
         <div className="mt-20 grid grid-cols-3 gap-6 max-w-xl mx-auto animate-slide-up delay-500">
           {[
-            { num: '500+', label: 'Zones Mapped' },
-            { num: '2M+', label: 'Citizens Reached' },
+            { num: '2,000+', label: 'Projects Tracked' },
+            { num: '2.1M+', label: 'Citizens Reached' },
             { num: '98%', label: 'Accuracy Rate' },
           ].map((s) => (
             <div key={s.label} className="text-center">
-              <div className="text-2xl font-black text-gradient-saffron">{s.num}</div>
+              <div className="text-2xl font-black text-gradient-saffron flex items-center justify-center">{s.num}</div>
               <div className="text-xs text-white/40 mt-1 tracking-wide">{s.label}</div>
             </div>
           ))}
